@@ -18,7 +18,7 @@
     "skipLibCheck": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": ["@yapmod/types/yapmod.d.ts"]
+    "types": ["@yapmod/types/plugin-env"]
   },
   "include": ["src"]
 }
