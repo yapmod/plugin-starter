@@ -20,5 +20,5 @@
     "jsxImportSource": "solid-js",
     "types": ["@yapmod/types/plugin-env"]
   },
-  "include": ["src"]
+  "include": ["plugins"]
 }

@@ -2,10 +2,9 @@
   "name": "plugin-starter",
   "version": "1.0.0",
   "description": "A starter template for building Yapmod plugins",
-  "main": "dist/index.js",
   "scripts": {
-    "build": "yapmod build --entry src/index.tsx --outfile dist/index.js",
-    "dev": "yapmod dev --entry src/index.tsx --outfile dist/index.js",
+    "build": "pnpm typecheck && node scripts/plugins.mjs build",
+    "dev": "node scripts/plugins.mjs dev",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [
@@ -20,5 +19,7 @@
     "@yapmod/types": "^1.1.0",
     "solid-js": "^1.9.18",
     "typescript": "^7.0.2"
-  }
+  },
+  "private": true,
+  "packageManager": "pnpm@12.10.1"
 }
