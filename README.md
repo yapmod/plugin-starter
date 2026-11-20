@@ -1,33 +1,29 @@
 # Yapmod Plugin Starter
 
-A starter template for building [Yapmod](https://github.com/yapmod) plugins with TypeScript and SolidJS.
+Develop and publish a collection of [Yapmod](https://github.com/yapmod) plugins from one public GitHub repository. Each plugin gets a catalog entry, a JavaScript download and its own stable import URL.
 
-## Quick Start
+## Develop a plugin
+
+Fork this repository, clone your fork, and run these commands from its root (Node 24 and pnpm 12):
 
 ```bash
-# Install dependencies
 pnpm install
-
-# Build the plugin
-pnpm build
-
-# Or develop with hot reload
-pnpm dev
-
-# Type-check without building
-pnpm typecheck
+pnpm dev starter
 ```
 
-## Project Structure
+Open the control page printed by the dev server to use hot reload. With a single plugin, `pnpm dev` also works.
 
-```
-├── src/
-│   └── index.tsx     # Your plugin entry point
-├── dist/             # Built output (generated)
-├── package.json
-├── tsconfig.json
-└── README.md
-```
+Edit `plugins/starter/index.tsx`. To add another plugin, copy `plugins/starter/` to a sibling such as `plugins/weather/`. Give it a distinct name, author, description and version in its own `package.json`, update its settings section ID and code, then run `pnpm dev weather`. Each folder name becomes part of its public URL. Use lowercase letters, digits and hyphens, and keep it stable after publication.
+
+## Build and publish
+
+`pnpm build` type-checks the collection, bundles each entry with the Yapmod CLI and writes `dist/<slug>/plugin.js`, `dist/<slug>/plugin.json` and `dist/index.html`. Open the HTML file for a local preview. Set `GITHUB_REPOSITORY=OWNER/REPO` when building locally to preview the import URLs as well. Build output is generated on every run.
+
+1. In your public fork, enable GitHub Actions and select **Settings → Pages → Build and deployment → Source → GitHub Actions**.
+2. Push to the default branch, or run **Actions → Plugin catalog → Run workflow** on that branch. The workflow uses the built-in GitHub token. Repository rules must allow it to write the generated `plugin-dist` branch.
+3. Open the deployment URL from the workflow to share the catalog. Future pushes rebuild the collection, including added and removed folders.
+
+Visitors can download a plugin’s JavaScript or copy its **Yapmod import URL**. In Yapmod, open **Plugins → Add Plugin**, leave **Local plugin** off, paste the URL into **Plugin URL** and select **Fetch**. Yapmod reads the manifest and bundle from `https://raw.githubusercontent.com/OWNER/REPO/plugin-dist/<slug>/`.
 
 ## TypeScript setup
 
@@ -45,7 +41,7 @@ The `plugin-env` entry declares the `yapmod` global, so it is fully typed everyw
 
 ## Writing Your Plugin
 
-The entry point (`src/index.tsx`) exports a **default function** that returns an object with lifecycle hooks. Inside it you have the fully typed `yapmod` API and the shared UI components:
+The entry point (`plugins/starter/index.tsx`) exports a **default function** that returns an object with lifecycle hooks. Inside it you have the fully typed `yapmod` API and the shared UI components:
 
 ```tsx
 import { Input, Section, SettingRow, SettingsPage } from '@yapmod/ui';
@@ -120,22 +116,6 @@ The `yapmod` object provides:
 - **`yapmod.solid`** — Access to the shared SolidJS instance
 
 Full API documentation is available at [yapmod.dev/docs](https://yapmod.dev/docs).
-
-## Building
-
-```bash
-pnpm build
-```
-
-This produces a single `dist/index.js` file that you can upload to Yapmod.
-
-## Developing
-
-```bash
-pnpm dev
-```
-
-Watches for file changes and rebuilds automatically.
 
 ## Dependencies
 
