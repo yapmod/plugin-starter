@@ -5,6 +5,7 @@
   "scripts": {
     "build": "pnpm typecheck && node scripts/plugins.mjs build",
     "dev": "node scripts/plugins.mjs dev",
+    "test": "node --test scripts/plugins.test.mjs",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [

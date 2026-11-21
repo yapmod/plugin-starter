@@ -17,13 +17,38 @@ Edit `plugins/starter/index.tsx`. To add another plugin, copy `plugins/starter/`
 
 ## Build and publish
 
-`pnpm build` type-checks the collection, bundles each entry with the Yapmod CLI and writes `dist/<slug>/plugin.js`, `dist/<slug>/plugin.json` and `dist/index.html`. Open the HTML file for a local preview. Set `GITHUB_REPOSITORY=OWNER/REPO` when building locally to preview the import URLs as well. Build output is generated on every run.
+`pnpm build` type-checks the collection, bundles each entry with the Yapmod CLI and writes `dist/<slug>/plugin.js`, `dist/<slug>/plugin.json` `dist/index.json` and `dist/index.html`. Open the HTML file for a local preview. Set `GITHUB_REPOSITORY=OWNER/REPO` when building locally to preview the import URLs as well. Build output is generated on every run.
 
 1. In your public fork, enable GitHub Actions and select **Settings → Pages → Build and deployment → Source → GitHub Actions**.
 2. Push to the default branch, or run **Actions → Plugin catalog → Run workflow** on that branch. The workflow uses the built-in GitHub token. Repository rules must allow it to write the generated `plugin-dist` branch.
 3. Open the deployment URL from the workflow to share the catalog. Future pushes rebuild the collection, including added and removed folders.
 
-Visitors can download a plugin’s JavaScript or copy its **Yapmod import URL**. In Yapmod, open **Plugins → Add Plugin**, leave **Local plugin** off, paste the URL into **Plugin URL** and select **Fetch**. Yapmod reads the manifest and bundle from `https://raw.githubusercontent.com/OWNER/REPO/plugin-dist/<slug>/`.
+Visitors can download a plugin’s JavaScript or copy its **Yapmod import URL**. In Yapmod, open **Plugins → Add Plugin**, select **URL**, paste the URL into **Plugin URL** and select **Fetch**. Yapmod reads the manifest and bundle from `https://raw.githubusercontent.com/OWNER/REPO/plugin-dist/<slug>/`.
+
+## Share the collection in Yapmod
+
+Edit `collection.json` at the repository root to set the collection's display name and optional description:
+
+```json
+{
+  "name": "My Yapmod plugins",
+  "description": "A collection of plugins for Yapin."
+}
+```
+
+Every build generates `dist/index.json` using Yapmod's `schemaVersion: 1` collection format. It lists every built plugin with its name, author, description and relative folder URL. Adding or removing a plugin folder updates the index on the next build; do not edit the generated file.
+
+After publishing, copy **Yapmod collection URL** from the catalog page:
+
+```text
+https://raw.githubusercontent.com/OWNER/REPO/plugin-dist/index.json
+```
+
+In a Yapmod client with collection support, open **Plugins → Add Plugin → Collection**, paste that URL and select **Add Collection**. Expand the collection group to install individual plugins. Adding a collection does not install or enable its plugins. Use the group's **Refresh** action to fetch new listings.
+
+The workflow publishes the index to both GitHub Pages and `plugin-dist`. Share the GitHub Raw URL for importing into Yapmod because Yapin restricts download hosts. Relative plugin URLs resolve alongside the index, so the file also works when hosted with its plugin folders elsewhere on an allowed host. Local builds without `GITHUB_REPOSITORY` still generate the index and a download link, but omit the published import URLs.
+
+Collection support is introduced in [yapmod/client#102](https://github.com/yapmod/client/pull/102). Older clients can still use individual plugin import URLs and JavaScript downloads.
 
 ## TypeScript setup
 
