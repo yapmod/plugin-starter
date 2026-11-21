@@ -39,6 +39,19 @@ function escapeHtml(value) {
 }
 
 async function buildCatalog() {
+  const metadata = JSON.parse(await readFile('collection.json', 'utf8'));
+  if (typeof metadata?.name !== 'string' || !metadata.name.trim()) {
+    throw new Error('collection.json: provide a non-empty string for name.');
+  }
+  if (metadata.description !== undefined && typeof metadata.description !== 'string') {
+    throw new Error('collection.json: description must be a string.');
+  }
+  const collection = {
+    schemaVersion: 1,
+    name: metadata.name.trim(),
+    description: metadata.description?.trim() ?? '',
+    plugins: [],
+  };
   const cards = [];
   await rm('dist', { recursive: true, force: true });
   for (const slug of folders) {
@@ -56,6 +69,12 @@ async function buildCatalog() {
     run('build', slug, '--outfile', bundle);
     manifest.hash = createHash('sha256').update(await readFile(bundle)).digest('hex');
     await writeFile(`dist/${slug}/plugin.json`, JSON.stringify(manifest, null, 2) + '\n');
+    collection.plugins.push({
+      name: manifest.name,
+      author: manifest.author,
+      description: manifest.description,
+      url: `./${slug}/`,
+    });
 
     const repo = process.env.GITHUB_REPOSITORY;
     const url = repo && `https://raw.githubusercontent.com/${repo}/plugin-dist/${slug}/`;
@@ -67,6 +86,16 @@ async function buildCatalog() {
       ${url ? `<label>Yapmod import URL<input readonly value="${escapeHtml(url)}" onclick="this.select()"></label>` : ''}
     </article>`);
   }
+  await writeFile('dist/index.json', JSON.stringify(collection, null, 2) + '\n');
   const template = await readFile(new URL('./catalog.html', import.meta.url), 'utf8');
-  await writeFile('dist/index.html', template.replace('<!-- plugins -->', () => cards.join('\n')));
+  const repo = process.env.GITHUB_REPOSITORY;
+  const collectionUrl = repo && `https://raw.githubusercontent.com/${repo}/plugin-dist/index.json`;
+  const introduction = `<h1>${escapeHtml(collection.name)}</h1>
+    <p>${escapeHtml(collection.description)}</p>
+    <p>Download individual plugins or add the whole collection in <strong>Plugins → Add Plugin → Collection</strong>.</p>
+    ${collectionUrl ? `<label>Yapmod collection URL<input readonly value="${escapeHtml(collectionUrl)}" onclick="this.select()"></label>` : '<p>Publish this catalog to get a collection import URL.</p>'}
+    <p><a href="./index.json" download="index.json">Download collection index</a></p>`;
+  await writeFile('dist/index.html', template
+    .replace('<!-- collection -->', () => introduction)
+    .replace('<!-- plugins -->', () => cards.join('\n')));
 }
