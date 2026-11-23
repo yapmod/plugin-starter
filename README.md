@@ -1,5 +1,7 @@
 # Yapmod Plugin Starter
 
+[![Total release asset downloads](https://img.shields.io/github/downloads/yapmod/plugin-starter/total)](https://github.com/yapmod/plugin-starter/releases) · [Download plugins from the catalog](https://yapmod.github.io/plugin-starter/)
+
 Develop and publish a collection of [Yapmod](https://github.com/yapmod) plugins from one public GitHub repository. Each plugin gets a catalog entry, a JavaScript download and its own stable import URL.
 
 ## Develop a plugin
